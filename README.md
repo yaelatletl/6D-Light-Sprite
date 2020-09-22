@@ -1,0 +1,1 @@
+6D Light Sprite
