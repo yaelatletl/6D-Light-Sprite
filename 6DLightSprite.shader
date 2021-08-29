@@ -10,6 +10,7 @@ uniform float point_size : hint_range(0,128);
 uniform int particles_anim_h_frames;
 uniform int particles_anim_v_frames;
 uniform bool particles_anim_loop;
+uniform bool debug_light_view;
 uniform vec3 uv1_scale;
 uniform vec3 uv1_offset;
 uniform vec3 uv2_scale;
@@ -18,19 +19,25 @@ uniform vec3 uv2_offset;
 
 
 void light() {
+	vec4 invcamx = INV_CAMERA_MATRIX[0];
+vec4 invcamy = INV_CAMERA_MATRIX[1];
+vec4 invcamz = INV_CAMERA_MATRIX[2];
+vec4 invcamw = INV_CAMERA_MATRIX[3];
+
+mat3 invcam = mat3(invcamx.xyz, invcamy.xyz, invcamz.xyz);
+
+vec3 world_normal = (vec4(NORMAL.x, NORMAL.y, NORMAL.z, 1.0) * INV_CAMERA_MATRIX).xyz;
 	vec4 front_top_left = texture(scatter_front_top_left, UV);
 	vec4 back_bottom_right = texture(scatter_back_bottom_right, UV);
-	vec3 light_view =  LIGHT;
-	float left_amount = clamp(front_top_left.r * light_view.x, 0.0, 1.0);
-	float top_amount = clamp(front_top_left.g * light_view.y, 0.0, 1.0);
-	float front_amount = clamp(front_top_left.b * light_view.z, 0.0, 1.0);
-	float right_amount = clamp(back_bottom_right.r * -light_view.x, 0.0, 1.0);
-	float bottom_amount = clamp(back_bottom_right.g * -light_view.y, 0.0, 1.0);
-	float back_amount = clamp(back_bottom_right.b * -light_view.z, 0.0, 1.0);
-	light_view.x = left_amount+right_amount;
-	light_view.y = top_amount+bottom_amount;
-	light_view.z = back_amount+front_amount;
-    DIFFUSE_LIGHT += clamp(dot(NORMAL, light_view), 0.0, 1.0) *  ATTENUATION * ALBEDO * LIGHT_COLOR;
+	float hMap = (LIGHT.x > 0.0) ? (front_top_left.r) : (back_bottom_right.r); 
+	float vMap = (LIGHT.y > 0.0) ? (front_top_left.g) : (back_bottom_right.g); 
+	float dMap = (LIGHT.z > 0.0) ? (front_top_left.b) : (back_bottom_right.b); 
+	float lightMap = hMap*LIGHT.x*LIGHT.x + vMap*LIGHT.y*LIGHT.y + dMap*LIGHT.z*LIGHT.z;
+	
+    DIFFUSE_LIGHT += clamp(lightMap, 0.0, 1.0) *  ATTENUATION * ALBEDO * LIGHT_COLOR;
+	if (debug_light_view == true){
+		DIFFUSE_LIGHT = lightMap*vec3(1.0);
+	}
 }
 
 void vertex() {

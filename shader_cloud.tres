@@ -6,7 +6,7 @@
 
 [resource]
 shader = ExtResource( 1 )
-shader_param/albedo = Color( 0.780392, 0.780392, 0.780392, 1 )
+shader_param/albedo = Color( 1, 1, 1, 1 )
 shader_param/specular = 0.0
 shader_param/metallic = 0.0
 shader_param/roughness = 1.0
@@ -14,6 +14,7 @@ shader_param/point_size = 1.0
 shader_param/particles_anim_h_frames = 1
 shader_param/particles_anim_v_frames = 1
 shader_param/particles_anim_loop = false
+shader_param/debug_light_view = false
 shader_param/uv1_scale = Vector3( 1, 1, 1 )
 shader_param/uv1_offset = Vector3( 0, 0, 0 )
 shader_param/uv2_scale = Vector3( 1, 1, 1 )
